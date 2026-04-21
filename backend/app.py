@@ -22,11 +22,13 @@ def predict():
         solar = float(data["solar_kwh"])
         temp = float(data["temperature"])
         sunlight = float(data["sunlight_hours"])
+        weather = float(data["weather_encoded"])  # ✅ ADD THIS
 
         input_df = pd.DataFrame({
             "solar_kwh": [solar],
             "temperature": [temp],
-            "sunlight_hours": [sunlight]
+            "sunlight_hours": [sunlight],
+            "weather_encoded": [weather]  # ✅ ADD THIS
         })
 
         prediction = model.predict(input_df)[0]
@@ -41,7 +43,15 @@ def predict():
         })
 
     except Exception as e:
+        print(e)  # 🔥 IMPORTANT (see error in logs)
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
+
+
+
+
+
+
