@@ -17,7 +17,7 @@ function App() {
   const [history, setHistory] = useState([]);
 
   const getPrediction = async () => {
-    const res = await fetch("http://127.0.0.1:5000/predict", {
+    const res = await fetch("https://solar-rzmj.onrender.com/predict", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
