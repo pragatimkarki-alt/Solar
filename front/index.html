@@ -1,32 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Smart Solar Dashboard</title>
+  <title>Smart Energy System</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-  <h1>⚡ Smart Solar Power Management</h1>
+  <h1>⚡ Smart Energy Management</h1>
 
   <div class="card">
-    <input type="number" id="temp" placeholder="Temperature (°C)">
-    <input type="number" id="sunlight" placeholder="Sunlight Hours">
+    <h3>☀️ Solar Input</h3>
+    <input id="sunlight" placeholder="Sunlight Hours">
 
     <select id="weather">
-      <option value="">Select Weather</option>
       <option>Sunny</option>
       <option>Cloudy</option>
       <option>Rainy</option>
     </select>
 
-    <button onclick="getPrediction()">Predict</button>
+    <h3>🏠 Appliances</h3>
+
+    <div class="appliance">
+      <input type="checkbox" id="fanCheck"> Fan  
+      <input type="number" id="fanCount" placeholder="No.">
+      <input type="number" id="fanHours" placeholder="Hours">
+    </div>
+
+    <div class="appliance">
+      <input type="checkbox" id="lightCheck"> Light  
+      <input type="number" id="lightCount" placeholder="No.">
+      <input type="number" id="lightHours" placeholder="Hours">
+    </div>
+
+    <div class="appliance">
+      <input type="checkbox" id="tvCheck"> TV  
+      <input type="number" id="tvCount" placeholder="No.">
+      <input type="number" id="tvHours" placeholder="Hours">
+    </div>
+
+    <div class="appliance">
+      <input type="checkbox" id="fridgeCheck"> Fridge  
+      <input type="number" id="fridgeCount" placeholder="No.">
+      <input type="number" id="fridgeHours" placeholder="Hours">
+    </div>
+
+    <div class="appliance">
+      <input type="checkbox" id="acCheck"> AC  
+      <input type="number" id="acCount" placeholder="No.">
+      <input type="number" id="acHours" placeholder="Hours">
+    </div>
+
+    <div class="appliance">
+      <input type="checkbox" id="geyserCheck"> Geyser  
+      <input type="number" id="geyserCount" placeholder="No.">
+      <input type="number" id="geyserHours" placeholder="Hours">
+    </div>
+
+    <button onclick="calculate()">Calculate</button>
   </div>
 
   <div id="result" class="card"></div>
-  <div id="suggestion" class="card"></div>
 
-  <h3>📊 Daily Analysis</h3>
   <canvas id="chart"></canvas>
 </div>
 
