@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load trained model
-model = joblib.load("energy_model.pkl")
+model = joblib.load("energy_model_1.pkl")
 
 @app.route("/")
 def home():
