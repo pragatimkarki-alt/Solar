@@ -4,7 +4,7 @@ body {
 }
 
 .container {
-  width: 600px;
+  width: 650px;
   margin: auto;
 }
 
@@ -15,10 +15,14 @@ body {
   border-radius: 10px;
 }
 
-input, select {
-  width: 80%;
-  padding: 10px;
-  margin: 5px;
+.appliance {
+  display: flex;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+input {
+  padding: 8px;
 }
 
 button {
@@ -26,13 +30,4 @@ button {
   background: orange;
   border: none;
   color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: darkorange;
-}
-
-canvas {
-  margin-top: 20px;
 }
