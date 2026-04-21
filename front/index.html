@@ -1,45 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Smart Solar Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="container">
-    <h1>⚡ Smart Solar Power Dashboard</h1>
+<div class="container">
+  <h1>⚡ Smart Solar Power Management</h1>
 
-    <div class="card">
-      <input type="number" id="temp" placeholder="Temperature (°C)">
-      <input type="number" id="sunlight" placeholder="Sunlight Hours">
+  <div class="card">
+    <input type="number" id="temp" placeholder="Temperature (°C)">
+    <input type="number" id="sunlight" placeholder="Sunlight Hours">
 
-      <select id="weather">
-        <option value="">Select Weather</option>
-        <option value="Sunny">Sunny</option>
-        <option value="Cloudy">Cloudy</option>
-        <option value="Rainy">Rainy</option>
-      </select>
+    <select id="weather">
+      <option value="">Select Weather</option>
+      <option>Sunny</option>
+      <option>Cloudy</option>
+      <option>Rainy</option>
+    </select>
 
-      <button onclick="getPrediction()">Predict</button>
-    </div>
-
-    <div id="result" class="result-card"></div>
-    <div id="suggestion" class="suggestion-card"></div>
-
-    <h3>📊 Daily Analysis</h3>
-    <div class="chart-box">
-      <canvas id="chart"></canvas>
-    </div>
-
-    <h3>📈 Yearly Analysis</h3>
-    <div class="chart-box">
-      <canvas id="yearChart"></canvas>
-    </div>
+    <button onclick="getPrediction()">Predict</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+  <div id="result" class="card"></div>
+  <div id="suggestion" class="card"></div>
+
+  <h3>📊 Daily Analysis</h3>
+  <canvas id="chart"></canvas>
+
+  <h3>📈 Yearly Analysis</h3>
+  <canvas id="yearChart"></canvas>
+
+  <div id="monthly" class="card"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
