@@ -8,13 +8,19 @@
 <body>
 
   <div class="container">
-    <h1>🌞 Solar Energy Dashboard</h1>
+    <h1>🌞 Smart Solar Power Management</h1>
 
     <div class="inputs">
-      <input type="number" id="sunlight" placeholder="Sunlight Hours">
       <input type="number" id="temp" placeholder="Temperature (°C)">
-      
-      <button onclick="getTemperature()">Auto Temp</button>
+      <input type="number" id="sunlight" placeholder="Sunlight Hours">
+
+      <select id="weather">
+        <option value="">Select Weather</option>
+        <option value="Sunny">Sunny</option>
+        <option value="Cloudy">Cloudy</option>
+        <option value="Rainy">Rainy</option>
+      </select>
+
       <button onclick="getPrediction()">Predict</button>
     </div>
 
