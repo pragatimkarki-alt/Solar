@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Solar Energy Dashboard</title>
+  <title>Smart Solar Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="container">
-    <h1>🌞 Smart Solar Power Management</h1>
+    <h1>⚡ Smart Solar Power Dashboard</h1>
 
-    <div class="inputs">
+    <div class="card">
       <input type="number" id="temp" placeholder="Temperature (°C)">
       <input type="number" id="sunlight" placeholder="Sunlight Hours">
 
@@ -24,10 +24,17 @@
       <button onclick="getPrediction()">Predict</button>
     </div>
 
-    <div id="result"></div>
+    <div id="result" class="result-card"></div>
+    <div id="suggestion" class="suggestion-card"></div>
 
+    <h3>📊 Daily Analysis</h3>
     <div class="chart-box">
       <canvas id="chart"></canvas>
+    </div>
+
+    <h3>📈 Yearly Analysis</h3>
+    <div class="chart-box">
+      <canvas id="yearChart"></canvas>
     </div>
   </div>
 
