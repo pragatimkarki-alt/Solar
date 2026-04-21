@@ -1,37 +1,29 @@
 const API_URL = "https://solar-rzmj.onrender.com/predict";
 
-let chart;
-let yearChart;
+let chart, yearChart;
 let history = [];
 
-// Weather mapping
-const weatherMap = {
-  Sunny: 2,
-  Cloudy: 1,
-  Rainy: 0
-};
+let batteryCapacity = 10;
+let batteryLevel = 5;
 
-// Solar calculation
+const costPerKwh = 6; // ₹
+
+const weatherMap = { Sunny: 2, Cloudy: 1, Rainy: 0 };
+
 function calculateSolar(sunlight, weather) {
-  const factor = {
-    Sunny: 1.0,
-    Cloudy: 0.6,
-    Rainy: 0.3
-  };
+  const factor = { Sunny: 1, Cloudy: 0.6, Rainy: 0.3 };
   return sunlight * 0.7 * 5 * factor[weather];
 }
 
-// Smart suggestions
-function generateSuggestion(solar, consumption, weather) {
-  if (solar >= consumption) {
-    return "✅ Use heavy appliances during daytime (Solar sufficient)";
-  } else if (weather === "Rainy") {
-    return "⚠️ Low solar generation. Use grid power carefully";
-  } else if (weather === "Cloudy") {
-    return "🌥️ Moderate solar. Avoid heavy loads";
-  } else {
-    return "⚠️ Consumption is high. Optimize usage";
-  }
+function generateSuggestion(solar, consumption) {
+  if (solar >= consumption)
+    return "✅ Use appliances during day to maximize solar usage";
+  else
+    return "⚠️ Reduce load or depend on grid";
+}
+
+function getSeasonalSunlight(day) {
+  return 6 + 2 * Math.sin((2 * Math.PI * day) / 365);
 }
 
 async function getPrediction() {
@@ -40,83 +32,110 @@ async function getPrediction() {
   const weather = document.getElementById("weather").value;
 
   if (!temp || !sunlight || !weather) {
-    alert("Please fill all fields");
+    alert("Fill all fields");
     return;
   }
 
   const solar = calculateSolar(Number(sunlight), weather);
-  const weather_encoded = weatherMap[weather];
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        solar_kwh: solar,
-        temperature: Number(temp),
-        sunlight_hours: Number(sunlight),
-        weather_encoded: weather_encoded
-      })
-    });
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      solar_kwh: solar,
+      temperature: Number(temp),
+      sunlight_hours: Number(sunlight),
+      weather_encoded: weatherMap[weather]
+    })
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    const grid = Math.max(0, data.predicted_consumption - solar);
+  let consumption = data.predicted_consumption;
+  let surplus = solar - consumption;
+  let grid = 0;
 
-    document.getElementById("result").innerHTML = `
-      <b>Solar:</b> ${solar.toFixed(2)} kWh<br>
-      <b>Consumption:</b> ${data.predicted_consumption.toFixed(2)} kWh<br>
-      <b>Grid:</b> ${grid.toFixed(2)} kWh<br>
-      <b>Status:</b> ${grid > 0 ? "Use Grid" : "Solar sufficient"}
-    `;
-
-    document.getElementById("suggestion").innerHTML =
-      generateSuggestion(solar, data.predicted_consumption, weather);
-
-    history.push({
-      solar,
-      consumption: data.predicted_consumption,
-      grid
-    });
-
-    updateChart();
-    generateYearChart();
-
-  } catch {
-    alert("Backend not reachable");
+  if (surplus > 0) {
+    batteryLevel = Math.min(batteryCapacity, batteryLevel + surplus);
+  } else {
+    let need = Math.abs(surplus);
+    if (batteryLevel >= need) batteryLevel -= need;
+    else {
+      grid = need - batteryLevel;
+      batteryLevel = 0;
+    }
   }
+
+  // 💰 COST CALCULATION
+  let gridCost = grid * costPerKwh;
+  let totalCostWithoutSolar = consumption * costPerKwh;
+  let savings = totalCostWithoutSolar - gridCost;
+
+  document.getElementById("result").innerHTML = `
+    Solar: ${solar.toFixed(2)} kWh <br>
+    Consumption: ${consumption.toFixed(2)} kWh <br>
+    Battery: ${batteryLevel.toFixed(2)} kWh <br>
+    Grid: ${grid.toFixed(2)} kWh <br><br>
+
+    💰 Grid Cost: ₹${gridCost.toFixed(2)} <br>
+    💡 Savings: ₹${savings.toFixed(2)}
+  `;
+
+  document.getElementById("suggestion").innerHTML =
+    generateSuggestion(solar, consumption);
+
+  history.push({ solar, consumption, grid });
+
+  updateChart();
+  generateYearChart();
 }
 
-// Daily chart
 function updateChart() {
-  const labels = history.map((_, i) => `Run ${i + 1}`);
-
   if (chart) chart.destroy();
 
   chart = new Chart(document.getElementById("chart"), {
     type: "bar",
     data: {
-      labels,
+      labels: history.map((_, i) => `Run ${i+1}`),
       datasets: [
         { label: "Solar", data: history.map(h => h.solar) },
         { label: "Consumption", data: history.map(h => h.consumption) },
         { label: "Grid", data: history.map(h => h.grid) }
       ]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
+    }
   });
 }
 
-// 1-year simulated chart
-function generateYearChart() {
-  const days = 365;
+async function generateYearChart() {
+  let solarArr=[], consArr=[], gridArr=[], costArr=[];
 
-  let solar = [];
-  let consumption = [];
+  for (let i=0;i<365;i++) {
+    let temp = 25 + Math.random()*10;
+    let sunlight = getSeasonalSunlight(i);
+    let weather = ["Sunny","Cloudy","Rainy"][Math.floor(Math.random()*3)];
 
-  for (let i = 0; i < days; i++) {
-    solar.push(Math.random() * 8);
-    consumption.push(4 + Math.random() * 3);
+    let solar = calculateSolar(sunlight, weather);
+
+    let res = await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        solar_kwh:solar,
+        temperature:temp,
+        sunlight_hours:sunlight,
+        weather_encoded:weatherMap[weather]
+      })
+    });
+
+    let data = await res.json();
+
+    let consumption = data.predicted_consumption;
+    let grid = Math.max(0, consumption - solar);
+
+    solarArr.push(solar);
+    consArr.push(consumption);
+    gridArr.push(grid);
+    costArr.push(grid * costPerKwh);
   }
 
   if (yearChart) yearChart.destroy();
@@ -124,12 +143,35 @@ function generateYearChart() {
   yearChart = new Chart(document.getElementById("yearChart"), {
     type: "line",
     data: {
-      labels: Array.from({ length: days }, (_, i) => i + 1),
+      labels: Array.from({length:365},(_,i)=>i+1),
       datasets: [
-        { label: "Solar (Year)", data: solar },
-        { label: "Consumption (Year)", data: consumption }
+        { label:"Solar", data:solarArr },
+        { label:"Consumption", data:consArr },
+        { label:"Grid", data:gridArr },
+        { label:"Cost (₹)", data:costArr }
       ]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
+    }
   });
+
+  generateMonthlyAnalytics(solarArr, consArr, gridArr, costArr);
+}
+
+function generateMonthlyAnalytics(solar, cons, grid, cost) {
+  let months = Array(12).fill(0).map(()=>({solar:0,cons:0,grid:0,cost:0}));
+
+  for (let i=0;i<365;i++){
+    let m=Math.floor(i/30);
+    months[m].solar+=solar[i];
+    months[m].cons+=cons[i];
+    months[m].grid+=grid[i];
+    months[m].cost+=cost[i];
+  }
+
+  let html="<h3>📊 Monthly Cost Analysis</h3>";
+
+  months.forEach((m,i)=>{
+    html+=`Month ${i+1} → ₹${m.cost.toFixed(0)} (Grid)<br>`;
+  });
+
+  document.getElementById("monthly").innerHTML=html;
 }
