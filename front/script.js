@@ -3,8 +3,6 @@ const API_URL = "https://solar-rzmj.onrender.com/predict";
 let chart;
 let history = [];
 
-const costPerKwh = 6;
-
 const weatherMap = {
   Sunny: 2,
   Cloudy: 1,
@@ -38,8 +36,10 @@ async function getPrediction() {
   const temp = document.getElementById("temp").value;
   const sunlight = document.getElementById("sunlight").value;
   const weather = document.getElementById("weather").value;
+  const costPerKwh = Number(document.getElementById("cost").value); // ✅ NEW
 
-  if (!temp || !sunlight || !weather) {
+  // ✅ Updated validation
+  if (!temp || !sunlight || !weather || !costPerKwh) {
     alert("Please fill all fields");
     return;
   }
@@ -64,10 +64,10 @@ async function getPrediction() {
 
     const consumption = data.predicted_consumption;
 
-    // Grid usage (NO BATTERY)
+    // Grid usage
     const grid = Math.max(0, consumption - solar);
 
-    // Cost calculation
+    // ✅ Cost calculation using user input
     const gridCost = grid * costPerKwh;
     const totalCostWithoutSolar = consumption * costPerKwh;
     const savings = totalCostWithoutSolar - gridCost;
