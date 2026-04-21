@@ -1,7 +1,7 @@
 const API_URL = "https://solar-rzmj.onrender.com/predict";
 
 // 🔑 Replace with your actual API key
-const WEATHER_API_KEY = "OPEN";
+const WEATHER_API_KEY = "66aebabc8b6a614389a868db24c5ec21";
 
 let chart;
 let history = [];
