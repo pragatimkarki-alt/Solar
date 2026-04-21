@@ -1,38 +1,38 @@
 const API_URL = "https://solar-rzmj.onrender.com/predict";
 
-// 🔑 Replace with your actual API key
-const WEATHER_API_KEY = "66aebabc8b6a614389a868db24c5ec21";
-
 let chart;
 let history = [];
 
-// 🌡️ Get temperature automatically
-async function getTemperature() {
-  try {
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=Bangalore&appid=${WEATHER_API_KEY}&units=metric`
-    );
+// Weather encoding
+const weatherMap = {
+  Sunny: 2,
+  Cloudy: 1,
+  Rainy: 0
+};
 
-    const data = await res.json();
-    document.getElementById("temp").value = data.main.temp.toFixed(1);
+// Solar calculation
+function calculateSolar(sunlight, weather) {
+  const factor = {
+    Sunny: 1.0,
+    Cloudy: 0.6,
+    Rainy: 0.3
+  };
 
-  } catch (err) {
-    alert("Failed to fetch temperature");
-  }
+  return sunlight * 0.7 * 5 * factor[weather];
 }
 
-// 🔮 Main function
 async function getPrediction() {
-  const sunlight = document.getElementById("sunlight").value;
   const temp = document.getElementById("temp").value;
+  const sunlight = document.getElementById("sunlight").value;
+  const weather = document.getElementById("weather").value;
 
-  if (!sunlight || !temp) {
+  if (!temp || !sunlight || !weather) {
     alert("Please fill all fields");
     return;
   }
 
-  // ☀️ Solar generation formula
-  const solarGeneration = Number(sunlight) * 0.7 * 5;
+  const solar = calculateSolar(Number(sunlight), weather);
+  const weather_encoded = weatherMap[weather];
 
   try {
     const res = await fetch(API_URL, {
@@ -41,40 +41,38 @@ async function getPrediction() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        solar_kwh: solarGeneration,
+        solar_kwh: solar,
         temperature: Number(temp),
-        sunlight_hours: Number(sunlight)
+        sunlight_hours: Number(sunlight),
+        weather_encoded: weather_encoded
       })
     });
 
     const data = await res.json();
 
-    // 🔌 Grid calculation
-    const gridUsage = Math.max(0, data.predicted_consumption - solarGeneration);
+    const grid = Math.max(0, data.predicted_consumption - solar);
 
-    // 📊 Display results
     document.getElementById("result").innerHTML = `
-      <p><b>Solar Generation:</b> ${solarGeneration.toFixed(2)} kWh</p>
-      <p><b>Consumption:</b> ${data.predicted_consumption} kWh</p>
-      <p><b>Grid Usage:</b> ${gridUsage.toFixed(2)} kWh</p>
-      <p><b>Status:</b> ${gridUsage > 0 ? "⚠️ Use Grid" : "✅ Solar sufficient"}</p>
+      <p><b>Solar Generation:</b> ${solar.toFixed(2)} kWh</p>
+      <p><b>Consumption:</b> ${data.predicted_consumption.toFixed(2)} kWh</p>
+      <p><b>Grid Usage:</b> ${grid.toFixed(2)} kWh</p>
+      <p><b>Status:</b> ${grid > 0 ? "⚠️ Use Grid" : "✅ Solar sufficient"}</p>
     `;
 
-    // Save history
     history.push({
-      solar: solarGeneration,
+      solar: solar,
       consumption: data.predicted_consumption,
-      grid: gridUsage
+      grid: grid
     });
 
     updateChart();
 
   } catch (err) {
-    alert("Backend not reachable (Render may be sleeping)");
+    alert("Backend not reachable");
   }
 }
 
-// 📈 Chart update
+// Chart update
 function updateChart() {
   const labels = history.map((_, i) => `Run ${i + 1}`);
 
