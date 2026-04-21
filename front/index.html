@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Solar Energy Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>🌞 Solar Energy Dashboard</h1>
+
+    <div class="inputs">
+      <input type="number" id="sunlight" placeholder="Sunlight Hours">
+      <input type="number" id="temp" placeholder="Temperature (°C)">
+      
+      <button onclick="getTemperature()">Auto Temp</button>
+      <button onclick="getPrediction()">Predict</button>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="chart-box">
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
