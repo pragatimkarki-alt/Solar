@@ -4,7 +4,7 @@ body {
 }
 
 .container {
-  width: 650px;
+  width: 600px;
   margin: auto;
 }
 
@@ -26,6 +26,11 @@ button {
   background: orange;
   border: none;
   color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: darkorange;
 }
 
 canvas {
